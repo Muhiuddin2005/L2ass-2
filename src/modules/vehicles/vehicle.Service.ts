@@ -5,7 +5,7 @@ interface VehiclePayload {
   type: string;
   registration_number: string;
   daily_rent_price: number;
-  availability_status: boolean;
+  availability_status: 'available' | 'booked';
 }
 
 const createVehicle = async (payload: VehiclePayload) => {
@@ -39,7 +39,7 @@ const updateVehicle = async (vehicleId: number, payload: VehiclePayload) => {
 
 const deleteVehicle = async (vehicleId: number) => {
   const bookingCheck = await pool.query(
-    "SELECT id FROM bookings WHERE vehicle_id = $1 AND status NOT IN ('completed', 'cancelled')",
+    "SELECT id FROM bookings WHERE vehicle_id = $1 AND status NOT IN ('returned', 'cancelled')",
     [vehicleId]
   );
 
@@ -50,7 +50,7 @@ const deleteVehicle = async (vehicleId: number) => {
   return await pool.query('DELETE FROM vehicles WHERE id = $1 RETURNING *', [vehicleId]);
 };
 
-export const vehiclesService = {
+export const vehicleServices = {
   createVehicle,
   getAllVehicles,
   getAvehicle,

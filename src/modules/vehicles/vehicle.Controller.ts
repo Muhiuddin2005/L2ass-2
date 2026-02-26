@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { vehiclesService } from "./vehiclesService";
+import { vehicleServices } from "./vehicle.Service";
 
 const createVehicle = async (req: Request, res: Response) => {
   try {
-    const result = await vehiclesService.createVehicle(req.body);
+    const result = await vehicleServices.createVehicle(req.body);
     res.status(201).json({ success: true, message: "Vehicle created successfully", data: result.rows[0] });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -12,7 +12,7 @@ const createVehicle = async (req: Request, res: Response) => {
 
 const getAllVehicles = async (req: Request, res: Response) => {
   try {
-    const result = await vehiclesService.getAllVehicles();
+    const result = await vehicleServices.getAllVehicles();
     res.status(200).json({
       success: true,
       message: result.rows.length > 0 ? "Vehicles retrieved successfully" : "No vehicles found",
@@ -25,7 +25,7 @@ const getAllVehicles = async (req: Request, res: Response) => {
 
 const getAvehicle = async (req: Request, res: Response) => {
   try {
-    const result = await vehiclesService.getAvehicle(Number(req.params.vehicleId));
+    const result = await vehicleServices.getAvehicle(Number(req.params.vehicleId));
     if (result.rows.length === 0) {
       return res.status(404).json({ success: false, message: "Vehicle not found" });
     }
@@ -37,7 +37,7 @@ const getAvehicle = async (req: Request, res: Response) => {
 
 const updateVehicle = async (req: Request, res: Response) => {
   try {
-    const result = await vehiclesService.updateVehicle(Number(req.params.vehicleId), req.body);
+    const result = await vehicleServices.updateVehicle(Number(req.params.vehicleId), req.body);
     if (result.rowCount === 0) {
       return res.status(404).json({ success: false, message: "Vehicle not found" });
     }
@@ -49,7 +49,7 @@ const updateVehicle = async (req: Request, res: Response) => {
 
 const deleteVehicle = async (req: Request, res: Response) => {
   try {
-    const result = await vehiclesService.deleteVehicle(Number(req.params.vehicleId));
+    const result = await vehicleServices.deleteVehicle(Number(req.params.vehicleId));
     if (result.rowCount === 0) {
       return res.status(404).json({ success: false, message: "Vehicle not found" });
     }
@@ -63,7 +63,7 @@ const deleteVehicle = async (req: Request, res: Response) => {
   }
 };
 
-export const vehiclesController = {
+export const vehicleControllers = {
   createVehicle,
   getAllVehicles,
   getAvehicle,

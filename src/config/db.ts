@@ -21,7 +21,7 @@ const createUsersQuery = `
       id SERIAL PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
       email VARCHAR(255) UNIQUE NOT NULL CHECK (email = LOWER(email)),
-      password VARCHAR(255) NOT NULL CHECK (LENGTH(password) >= 6),
+      password TEXT NOT NULL,
       phone VARCHAR(20) NOT NULL,
       role VARCHAR(10) NOT NULL CHECK (role IN ('admin', 'customer'))
     );
