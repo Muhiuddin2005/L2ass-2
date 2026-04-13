@@ -55,12 +55,23 @@ const getAllUsers = async () => {
   return result;
 };
 
-const updateUser = async (id: string, payload: UserPayload) => {
+const updateUser = async (id: string, payload: UserPayload, userRole?: string) => {
   const { name, email, phone, role } = payload;
-
+  const current = await pool.query(`SELECT * FROM users WHERE id=$1`, [id]);
+  const user = current.rows[0];
+  
+  if (!user) {
+    throw new Error("User not found");
+  }
+  
+  const updatedName  = name  ?? user.name;
+  const updatedEmail = email ?? user.email;
+  const updatedPhone = phone ?? user.phone;
+  const updatedRole  = userRole === 'admin' && role ? role : user.role;
+  
   const result = await pool.query(
     `UPDATE users SET name=$1, email=$2, phone=$3, role=$4 WHERE id=$5 RETURNING id, name, email, phone, role`,
-    [name, email, phone, role, id]
+    [updatedName, updatedEmail, updatedPhone, updatedRole, id]
   );
 
   return result;

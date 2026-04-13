@@ -28,13 +28,34 @@ const getAvehicle = async (vehicleId: number) => {
 
 const updateVehicle = async (vehicleId: number, payload: VehiclePayload) => {
   const { vehicle_name, type, registration_number, daily_rent_price, availability_status } = payload;
+  const current = await pool.query(`SELECT * FROM vehicles WHERE id=$1`, [vehicleId]);
+  const vehicle = current.rows[0];
+  if (!vehicle) {
+  throw new Error(`Vehicle with id ${vehicleId} not found`);
+}
+  const updatedName         = vehicle_name         ?? vehicle.vehicle_name;
+  const updatedType         = type                 ?? vehicle.type;
+  const updatedRegNumber    = registration_number  ?? vehicle.registration_number;
+  const updatedDailyRent    = daily_rent_price     ?? vehicle.daily_rent_price;
+  const updatedAvailability = availability_status  ?? vehicle.availability_status;
+
   const query = `
     UPDATE vehicles 
-    SET vehicle_name = $1, type = $2, registration_number = $3, daily_rent_price = $4, availability_status = $5
-    WHERE id = $6
+    SET vehicle_name=$1, type=$2, registration_number=$3, daily_rent_price=$4, availability_status=$5
+    WHERE id=$6
     RETURNING *;
   `;
-  return await pool.query(query, [vehicle_name, type, registration_number, daily_rent_price, availability_status, vehicleId]);
+
+  const result = await pool.query(query, [
+    updatedName,
+    updatedType,
+    updatedRegNumber,
+    updatedDailyRent,
+    updatedAvailability,
+    vehicleId
+  ]);
+
+  return result;
 };
 
 const deleteVehicle = async (vehicleId: number) => {

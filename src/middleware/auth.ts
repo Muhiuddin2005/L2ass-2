@@ -7,7 +7,10 @@ const auth = (...roles: string[]) => {
     try {
       let token = req.headers.authorization;
       if (!token) {
-        return res.status(500).json({ message: "You are not allowed!!" });
+        return res.status(401).json({ 
+          success: false,
+          message: "Unauthorized: Missing authentication token" 
+        });
       }
       if (token.startsWith('Bearer ')) {
         token = token.split(' ')[1]; 
@@ -17,10 +20,16 @@ const auth = (...roles: string[]) => {
         config.jwtSecret as string
       ) as JwtPayload;
       req.user = decoded;
-      if (roles.length && !roles.includes(decoded.role as string)) {
-        return res.status(500).json({
-          error: "unauthorized!!!",
-        });
+      if (roles.length) {
+        const isAdmin   = decoded.role === "admin";
+        const isSameUser = String(decoded.id) === String(req.params.id);
+
+        if (!isAdmin && !isSameUser) {
+          return res.status(403).json({
+            success: false,
+            message: "Forbidden: You can only access your own data!",
+          });
+        }
       }
       next();
     } catch (err: any) {

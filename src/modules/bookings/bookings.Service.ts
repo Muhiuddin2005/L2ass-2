@@ -74,6 +74,21 @@ const createBooking = async (payload: BookingPayload) => {
 };
 
 const getAllBookings = async (user: { id: number; role: string }) => {
+  await pool.query(`
+    UPDATE bookings 
+    SET status = 'returned' 
+    WHERE status = 'active' AND rent_end_date < CURRENT_DATE
+  `);
+
+  await pool.query(`
+    UPDATE vehicles 
+    SET availability_status = 'available' 
+    WHERE id IN (
+      SELECT vehicle_id FROM bookings 
+      WHERE status = 'returned' AND rent_end_date < CURRENT_DATE
+    )
+  `);
+
   let query: string;
   let values: any[] = [];
 

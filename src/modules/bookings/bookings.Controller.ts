@@ -3,6 +3,16 @@ import { bookingServices } from './bookings.Service';
 
 const createBooking = async (req: Request, res: Response) => {
   try {
+    const user = req.user as { id: number; role: string };
+    const { customer_id } = req.body;
+    
+    if (user.role === 'customer' && user.id !== customer_id) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only create bookings for yourself"
+      });
+    }
+    
     const result = await bookingServices.createBooking(req.body);
     res.status(201).json({
       success: true,

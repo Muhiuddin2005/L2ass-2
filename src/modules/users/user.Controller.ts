@@ -51,7 +51,22 @@ const getAllUsers = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
   try {
-    const result = await userServices.updateUser(req.params.id as string, req.body);
+    const isAdmin = req.user?.role === 'admin';
+    const isOwnProfile = String(req.user?.id) === String(req.params.id);
+    
+    if (!isAdmin && !isOwnProfile) {
+      return res.status(403).json({ success: false, message: "You can only update your own profile" });
+    }
+    
+    if (!isAdmin && isOwnProfile && req.body.role) {
+      return res.status(403).json({ success: false, message: "You cannot change your role" });
+    }
+    
+    if (!isAdmin && isOwnProfile) {
+      delete req.body.role;
+    }
+    
+    const result = await userServices.updateUser(req.params.id as string, req.body, req.user?.role);
     if (result.rows.length === 0) {
       return res.status(404).json({ success: false, message: "User not found" });
     }

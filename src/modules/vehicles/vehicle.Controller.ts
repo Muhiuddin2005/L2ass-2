@@ -19,7 +19,7 @@ const getAllVehicles = async (req: Request, res: Response) => {
       data: result.rows
     });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

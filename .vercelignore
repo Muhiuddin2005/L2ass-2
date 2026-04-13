@@ -1,0 +1,7 @@
+node_modules
+.git
+.env
+.env.local
+README.md
+API_REFERENCE.md
+.gitignore
